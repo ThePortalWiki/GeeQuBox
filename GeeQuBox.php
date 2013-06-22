@@ -29,6 +29,16 @@ $wgExtensionCredits['parserhook'][] = array(
 	'descriptionmsg' => 'geequbox-desc'
 );
 
+// see http://www.mediawiki.org/wiki/ResourceLoader/Documentation/Using_with_extensions
+$wgResourceModules['ext.GeeQuBox'] = array(
+	// JavaScript and CSS styles. To combine multiple file, just list them as an array.
+	'scripts' => 'js/jquery.lightbox-0.5.min.js',
+	// ResourceLoader needs to know where your files are; specify your
+	// subdir relative to "extensions" or $wgExtensionAssetsPath
+	'localBasePath' => dirname( __FILE__ ),
+	'remoteExtPath' => EXTPATH,
+	'position' => 'top',
+);
 
 // defaults
 $wgGqbDefaultWidth = 1024;
@@ -55,11 +65,20 @@ class GeeQuBox {
 		try {
 			self::$_page = $page;
 			$this->_gqbReplaceHref( $page );
+			$this->_gqbAddScripts( $page );
 			return true;
 		} catch ( Exception $e ) {
 			wfDebug('GeeQuBox::'.$e->getMessage());
 			return false;
 		}
+	}
+
+	private function _gqbAddScripts() {
+		global $wgExtensionAssetsPath;
+
+		$eDir = $wgExtensionAssetsPath .'/'.EXTPATH.'/';
+		self::$_page->addModules( 'ext.GeeQuBox' );
+		return true;
 	}
 
 	/**
@@ -72,7 +91,7 @@ class GeeQuBox {
 		global $wgGqbDefaultWidth;
 
 		$page = self::$_page->getHTML();
-		$pattern = '~href="/wiki/([^"]+)"\s*class="image"~';	
+		$pattern = '~href="/wiki/([^"]+)"\s*class="image"~';
 		$replaced = preg_replace_callback($pattern,'self::_gqbReplaceMatches',$page);
 
 		self::$_page->clearHTML();
