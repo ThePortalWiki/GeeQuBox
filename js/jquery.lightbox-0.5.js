@@ -34,11 +34,6 @@
         }, settings);
         var jQueryMatchedObj = this;
 
-        function _initialize() {
-            _start(this, jQueryMatchedObj);
-            return false;
-        }
-
         function _start(objClicked, jQueryMatchedObj) {
             $('embed, object, select').css({
                 'visibility': 'hidden'
@@ -340,6 +335,11 @@
             }
             while (curDate - date < ms);
         };
-        return this.unbind('click').click(_initialize);
+        return this.unbind('click').click(function (e) {
+            if (e.button == 0) {
+                _start(this, jQueryMatchedObj);
+                return false;
+            }
+        });
     };
 })(jQuery);
